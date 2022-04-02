@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["mongoDb"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+
+}
+
+model Parking {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  total     Int
+  two       Int
+  suv       Int
+  hatchback Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  slot      Slot[]
+}
+
+model Slot {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String    @unique
+  status    Int
+  type      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
+  parking   Parking   @relation(fields: [parkingId], references: [id])
+  parkingId String    @db.ObjectId
+  History   History[]
+}
+
+model Car {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  licence   String    @unique
+  type      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
+  History   History[]
+}
+
+model History {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  car       Car       @relation(fields: [carId], references: [id])
+  slot      Slot      @relation(fields: [slotId], references: [id])
+  price     Int?
+  status    Int?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
+  exitAt    DateTime?
+  carId     String    @db.ObjectId
+  slotId    String    @db.ObjectId
+}
